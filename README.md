@@ -12,4 +12,6 @@ zig build run
 
 
 # current bugs
-- [ ] fix the weird positioning that is currently happing
+- [x] fix the weird positioning that is currently happening with x and y
+- [ ] fix y being upside down
+- [x] fix shadows being light with specular
