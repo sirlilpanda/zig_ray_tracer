@@ -74,10 +74,11 @@ pub fn main() !void {
         },
     );
     var ball2 = objects.Object.init(
-        objects.ObjectType.sphere,
+        objects.ObjectType.cylinder,
         .{
-            .center = Vec3f32.init(-20, -70, -150),
+            .center = Vec3f32.init(-20, 40, -150),
             .radius = 10,
+            .height = 50,
         },
     );
 
