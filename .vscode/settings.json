@@ -1,0 +1,9 @@
+{
+    "cmake.configureOnOpen": true,
+
+    "files.exclude": {
+        "zig-cache": true,
+        "zig-out": true,
+    }
+
+}

@@ -1,5 +1,9 @@
+const VecError = error{
+    invalidVec,
+};
+
 pub fn Vec3(comptime T: type) type {
-    return struct {
+    return packed struct {
         const Self = @This();
         x: T,
         y: T,
@@ -35,7 +39,7 @@ pub fn Vec3(comptime T: type) type {
 
         pub fn norm(a: Self) Self {
             const den: T = len(a);
-            return div(a, den);
+            return a.scale(1 / den);
         }
 
         pub fn add(a: Self, b: Self) Self {
@@ -90,6 +94,34 @@ pub fn Vec3(comptime T: type) type {
             return if (a.x == b.x and
                 a.y == b.y and
                 a.z == b.z) true else false;
+        }
+
+        // https://graphics.stanford.edu/courses/cs148-10-summer/docs/2006--degreve--reflection_refraction.pdf
+
+        pub fn reflect(a: Self, b: Self) Self {
+            const cosI = -a.dot(b);
+            return b.add(a.scale(2 * cosI));
+        }
+
+        pub fn refract(a: Self, b: Self, n1: T, n2: T) VecError!Self {
+            const n = n1 / n2;
+            const cosI = -a.dot(b);
+            const sinT2 = n * n * (1 - cosI * cosI);
+            if (sinT2 > 1) return VecError.invalidVec;
+            const cosT = @sqrt(1 - sinT2);
+            return b.scale(n).add(a.scale(n * (cosI - cosT)));
+        }
+
+        // used for water or some shit, if its further away then its more refective or something like that
+        pub fn reflectance(a: Self, b: Self, n1: T, n2: T) T {
+            const n = n1 / n2;
+            const cosI = -a.dot(b);
+            const sinT2 = n * n * (1 - cosI * cosI);
+            if (sinT2 > 1) return 1;
+            const cosT = @sqrt(1 - sinT2);
+            const r0rth = (n1 * cosI - n2 * cosT) / (n1 * cosI - n2 * cosT);
+            const rPar = (n2 * cosI - n1 * cosT) / (n2 * cosI - n1 * cosT);
+            return (r0rth * r0rth + rPar * rPar) / 2;
         }
     };
 }
