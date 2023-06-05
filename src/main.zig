@@ -8,13 +8,13 @@ const objects = @import("objects/Object.zig");
 
 const Vec3f32 = vec.Vec3(f32);
 const Colour = types.Colour;
-const Screen = screen.Screen(255, 255);
+const Screen = screen.Screen(140, 140);
 
 const background_colour: Colour = Colour.init(0, 0, 0);
-const light_pos: Vec3f32 = Vec3f32.init(-10, 25, 0);
+const light_pos: Vec3f32 = Vec3f32.init(-50, -50, 0);
 const ambient_term: f32 = 0.2;
 
-const plane_dist: f32 = 40;
+const plane_dist: f32 = 100;
 const max_step = 5;
 
 var scene_objects: [2]objects.Object = undefined;
@@ -51,8 +51,8 @@ pub fn fillScreen(outScreen: Screen) !void {
             var ray: Iray.Ray = Iray.Ray.init(eye_pos, dir);
             const c: Colour = trace(ray, 0);
             try outScreen.set_pixel(
-                @intCast(u16, j + outScreen.width / 2),
                 @intCast(u16, i + outScreen.width / 2),
+                @intCast(u16, j + outScreen.width / 2),
                 c,
             );
         }
@@ -76,12 +76,14 @@ pub fn main() !void {
     var ball2 = objects.Object.init(
         objects.ObjectType.sphere,
         .{
-            .center = Vec3f32.init(-20, 70, -150),
+            .center = Vec3f32.init(-20, -70, -150),
             .radius = 10,
         },
     );
 
     ball.color = Colour.init(1, 0, 1);
+    ball.shininess = 100;
+    ball.isspecularity = true;
     ball2.color = Colour.init(1, 1, 1);
 
     scene_objects[0] = ball;
