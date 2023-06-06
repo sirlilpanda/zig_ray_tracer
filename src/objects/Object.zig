@@ -36,9 +36,21 @@ pub const Object = struct {
 
     pub fn init(comptime object: ObjectType, args: anytype) Self {
         const o: Objects = switch (object) {
-            .sphere => Objects{ .sphere = import_sphere.Sphere.init(args.center, args.radius) },
-            .cylinder => Objects{ .cylinder = import_cylinder.Cylinder.init(args.center, args.radius, args.height) },
-            .plane => Objects{ .plane = import_plane.Plane.init(args.a, args.b, args.c, args.d) },
+            .sphere => Objects{ .sphere = import_sphere.Sphere.init(
+                args.center,
+                args.radius,
+            ) },
+            .cylinder => Objects{ .cylinder = import_cylinder.Cylinder.init(
+                args.center,
+                args.radius,
+                args.height,
+            ) },
+            .plane => Objects{ .plane = import_plane.Plane.init(
+                args.a,
+                args.b,
+                args.c,
+                args.d,
+            ) },
         };
         return Self{
             .color = Colour.init(0, 0, 0),
