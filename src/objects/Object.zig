@@ -1,6 +1,7 @@
 const types = @import("../types.zig");
 const import_sphere = @import("sphere.zig");
 const import_cylinder = @import("Cylinder.zig");
+const import_plane = @import("Plane.zig");
 const pow = @import("std").math.pow;
 const std = @import("std");
 const Vec3f32 = types.Vec3f32;
@@ -8,7 +9,7 @@ const Colour = types.Colour;
 
 pub const ObjectType = enum {
     sphere,
-    // plane,
+    plane,
     // cone,
     cylinder,
 };
@@ -16,6 +17,7 @@ pub const ObjectType = enum {
 const Objects = union(ObjectType) {
     sphere: import_sphere.Sphere,
     cylinder: import_cylinder.Cylinder,
+    plane: import_plane.Plane,
 };
 
 pub const Object = struct {
@@ -36,6 +38,7 @@ pub const Object = struct {
         const o: Objects = switch (object) {
             .sphere => Objects{ .sphere = import_sphere.Sphere.init(args.center, args.radius) },
             .cylinder => Objects{ .cylinder = import_cylinder.Cylinder.init(args.center, args.radius, args.height) },
+            .plane => Objects{ .plane = import_plane.Plane.init(args.a, args.b, args.c, args.d) },
         };
         return Self{
             .color = Colour.init(0, 0, 0),
@@ -56,12 +59,14 @@ pub const Object = struct {
         return switch (o.obj) {
             .sphere => |s| s.normal(point),
             .cylinder => |c| c.normal(point),
+            .plane => |p| p.normal(),
         };
     }
     pub fn intersect(o: Self, center: Vec3f32, dir: Vec3f32) f32 {
         return switch (o.obj) {
             .sphere => |s| s.intersect(center, dir),
             .cylinder => |c| c.intersect(center, dir),
+            .plane => |p| p.intersect(center, dir),
         };
     }
 
@@ -78,7 +83,6 @@ pub const Object = struct {
         const ambientColour = o.color.scale(ambientTerm);
         const dotColour = o.color.scale(lDotn);
         const specterm = Vec3f32.init(1, 1, 1).scale(specularTerm);
-        // std.debug.print("ambientColour : {}\ndotColour : {}\nspecterm :{}\n", .{ ambientColour, dotColour, specterm });
 
         return ambientColour.add(dotColour).add(specterm);
     }
