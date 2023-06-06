@@ -8,7 +8,7 @@ const objects = @import("objects/Object.zig");
 
 const Vec3f32 = vec.Vec3(f32);
 const Colour = types.Colour;
-const Screen = screen.Screen(140, 140);
+const Screen = screen.Screen(500, 500);
 
 const background_colour: Colour = Colour.init(0, 0, 0);
 const light_pos: Vec3f32 = Vec3f32.init(-50, -50, 0);
@@ -20,16 +20,25 @@ const max_step = 5;
 var scene_objects: [3]objects.Object = undefined;
 
 pub fn trace(ray: Iray.Ray, step: u8) Colour {
-    _ = step;
-    const cache: Iray.hitNindex = ray.closestPoint(scene_objects);
+    const cache = ray.closestPoint(scene_objects);
     if (!cache.found) return background_colour;
+    const hit = cache.hit orelse std.debug.panic("smt fucked up", .{});
 
     var colour: Colour = scene_objects[cache.index orelse 0].lighting(
         light_pos,
         ray.dir.scale(-1),
-        cache.hit orelse std.debug.panic("smt fucked up", .{}),
+        hit,
         ambient_term,
     );
+
+    const lightvec: Vec3f32 = light_pos.sub(hit);
+    const shadowRay: Iray.Ray = Iray.Ray.init(hit, lightvec);
+    const shadowRayCache = shadowRay.closestPoint(scene_objects);
+    // const shadowHit = shadowRayCache.hit orelse std.debug.panic("smt fucked up", .{});
+    if ((shadowRayCache.found) and (shadowRayCache.dist orelse 0 < lightvec.len() and (step < max_step))) {
+        return colour.scale(ambient_term);
+    }
+
     return colour;
 }
 
@@ -70,14 +79,12 @@ pub fn main() !void {
     const point_B: Vec3f32 = Vec3f32.init(20, 15, 0);
     const point_C: Vec3f32 = Vec3f32.init(20, 15, -200);
     const point_D: Vec3f32 = Vec3f32.init(-20, 15, -200);
-    const point_E: Vec3f32 = Vec3f32.init(-20, 30, -200);
-    _ = point_E;
-    const point_F: Vec3f32 = Vec3f32.init(20, 30, -200);
+    const point_E: Vec3f32 = Vec3f32.init(-20, -30, -200);
+    const point_F: Vec3f32 = Vec3f32.init(20, -30, -200);
     _ = point_F;
     const point_G: Vec3f32 = Vec3f32.init(20, 30, 0);
     _ = point_G;
-    const point_H: Vec3f32 = Vec3f32.init(-20, 30, 0);
-    _ = point_H;
+    const point_H: Vec3f32 = Vec3f32.init(-20, -30, 0);
 
     var ball = objects.Object.init(
         objects.ObjectType.sphere,
@@ -94,25 +101,37 @@ pub fn main() !void {
             .height = 50,
         },
     );
+    _ = ball2;
     var floor = objects.Object.init(
         objects.ObjectType.plane,
         .{
-            .a = point_A,
-            .b = point_B,
-            .c = point_C,
-            .d = point_D,
+            .a = point_D,
+            .b = point_C,
+            .c = point_B,
+            .d = point_A,
+        },
+    );
+    var leftWall = objects.Object.init(
+        objects.ObjectType.plane,
+        .{
+            .a = point_D,
+            .b = point_E,
+            .c = point_H,
+            .d = point_A,
         },
     );
 
     ball.color = Colour.init(1, 0, 1);
     ball.shininess = 100;
     ball.isspecularity = true;
-    ball2.color = Colour.init(1, 1, 1);
-    floor.color = Colour.init(1, 1, 1);
+    leftWall.color = Colour.init(1, 1, 1);
+    floor.color = Colour.init(0, 0, 1);
+    floor.shininess = 50;
+    floor.isspecularity = true;
 
     scene_objects[1] = ball;
-    scene_objects[2] = ball2;
-    scene_objects[0] = floor;
+    scene_objects[0] = leftWall;
+    scene_objects[2] = floor;
 
     try fillScreen(char_screen);
     try char_screen.print(stdout);
