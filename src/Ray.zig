@@ -5,9 +5,10 @@ const Vec3f32 = types.Vec3f32;
 
 const R_step: f32 = 0.005; // so the closest obj is not itself
 
-pub const hitNindex = struct {
+pub const Hitcheck = struct {
     hit: ?Vec3f32,
     index: ?usize,
+    dist: ?f32,
     found: bool,
 };
 
@@ -23,10 +24,11 @@ pub const Ray = struct {
         };
     }
 
-    pub fn closestPoint(self: Self, objs: [3]objects.Object) hitNindex {
+    pub fn closestPoint(self: Self, objs: [3]objects.Object) Hitcheck {
         var tmin: f32 = 1e+6;
-        var hit: ?Vec3f32 = null;
         var found: bool = false;
+        var hit: ?Vec3f32 = null;
+        var dist: ?f32 = null;
         var closest_object_index: ?usize = null;
         for (objs, 0..) |obj, i| {
             var t = obj.intersect(self.p0, self.dir);
@@ -35,11 +37,14 @@ pub const Ray = struct {
                     hit = self.p0.add(self.dir.scale(t));
                     closest_object_index = i;
                     found = true;
+                    dist = t;
+                    tmin = t;
                 }
             }
         }
-        return hitNindex{
+        return Hitcheck{
             .hit = hit,
+            .dist = dist,
             .index = closest_object_index,
             .found = found,
         };
