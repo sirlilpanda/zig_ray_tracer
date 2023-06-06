@@ -17,7 +17,7 @@ const ambient_term: f32 = 0.2;
 const plane_dist: f32 = 100;
 const max_step = 5;
 
-var scene_objects: [2]objects.Object = undefined;
+var scene_objects: [3]objects.Object = undefined;
 
 pub fn trace(ray: Iray.Ray, step: u8) Colour {
     _ = step;
@@ -66,6 +66,19 @@ pub fn main() !void {
     const stdout = bw.writer();
     var char_screen: Screen = Screen.init();
 
+    const point_A: Vec3f32 = Vec3f32.init(-20, 15, 0);
+    const point_B: Vec3f32 = Vec3f32.init(20, 15, 0);
+    const point_C: Vec3f32 = Vec3f32.init(20, 15, -200);
+    const point_D: Vec3f32 = Vec3f32.init(-20, 15, -200);
+    const point_E: Vec3f32 = Vec3f32.init(-20, 30, -200);
+    _ = point_E;
+    const point_F: Vec3f32 = Vec3f32.init(20, 30, -200);
+    _ = point_F;
+    const point_G: Vec3f32 = Vec3f32.init(20, 30, 0);
+    _ = point_G;
+    const point_H: Vec3f32 = Vec3f32.init(-20, 30, 0);
+    _ = point_H;
+
     var ball = objects.Object.init(
         objects.ObjectType.sphere,
         .{
@@ -81,14 +94,25 @@ pub fn main() !void {
             .height = 50,
         },
     );
+    var floor = objects.Object.init(
+        objects.ObjectType.plane,
+        .{
+            .a = point_A,
+            .b = point_B,
+            .c = point_C,
+            .d = point_D,
+        },
+    );
 
     ball.color = Colour.init(1, 0, 1);
     ball.shininess = 100;
     ball.isspecularity = true;
     ball2.color = Colour.init(1, 1, 1);
+    floor.color = Colour.init(1, 1, 1);
 
-    scene_objects[0] = ball;
-    scene_objects[1] = ball2;
+    scene_objects[1] = ball;
+    scene_objects[2] = ball2;
+    scene_objects[0] = floor;
 
     try fillScreen(char_screen);
     try char_screen.print(stdout);
