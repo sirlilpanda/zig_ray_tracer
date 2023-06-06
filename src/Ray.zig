@@ -23,7 +23,7 @@ pub const Ray = struct {
         };
     }
 
-    pub fn closestPoint(self: Self, objs: [2]objects.Object) hitNindex {
+    pub fn closestPoint(self: Self, objs: [3]objects.Object) hitNindex {
         var tmin: f32 = 1e+6;
         var hit: ?Vec3f32 = null;
         var found: bool = false;
