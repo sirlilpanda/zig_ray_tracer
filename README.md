@@ -15,13 +15,16 @@ zig build run
 - [x] fix the weird positioning that is currently happening with x and y
 - [ ] fix y being upside down
 - [x] fix shadows being light with specular
-- [ ] fix objects overlapping depending on pos in scene_objects
+- [x] fix objects overlapping depending on pos in scene_objects
+- [ ] fix cylinder shadows
+- [ ] fix planes being shit -- i think im wraping them backwards
+
 
 # todo
 - [ ] add tests to just about everything
 - [x] add plane
 - [ ] add cone
 - [ ] add transparcy
-- [ ] add shadows
+- [x] add shadows
 - [ ] add Reflectivtions
 - [ ] add Refractivtions
